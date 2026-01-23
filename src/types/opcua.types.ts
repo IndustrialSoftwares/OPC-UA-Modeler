@@ -52,3 +52,12 @@ export interface NodesetMetadata {
   nodeCount: number;
   loadedAt: Date;
 }
+
+// OPC UA Nodeset
+export interface OpcUaNodeset {
+  fileName: string;
+  namespaceUri: string;
+  namespaceIndex: number;
+  nodes: Map<string, OpcUaNode>;
+  rootNodes: OpcUaNode[];
+}
