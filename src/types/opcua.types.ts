@@ -51,6 +51,12 @@ export interface NodesetMetadata {
   version?: string;
   nodeCount: number;
   loadedAt: Date;
+  id: string;
+  name: string;
+  filePath?: string;
+  fileSize: number;
+  namespaces: Namespace[];
+  checksum?: string;
 }
 
 // OPC UA Nodeset
@@ -60,4 +66,20 @@ export interface OpcUaNodeset {
   namespaceIndex: number;
   nodes: Map<string, OpcUaNode>;
   rootNodes: OpcUaNode[];
+  
+}
+
+// OPC UA Nodeset
+export interface OpcUaNodeset {
+  fileName: string;
+  namespaceUri: string;
+  namespaceIndex: number;
+  nodes: Map<string, OpcUaNode>;
+  rootNodes: OpcUaNode[];
+}
+
+// Namespace entry
+export interface Namespace {
+  index: number;
+  uri: string;
 }

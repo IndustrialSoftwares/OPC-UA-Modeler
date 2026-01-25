@@ -6,3 +6,20 @@
   overflow: auto;
   background-color: var(--theme-color-std-bkg);
 }
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.2fr) minmax(280px, 0.8fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  align-items: start;
+}
+
+.empty-workspace {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px dashed var(--theme-color-soft-bdr);
+  border-radius: 8px;
+  color: var(--theme-color-soft-text);
+  text-align: center;
+}
