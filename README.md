@@ -179,10 +179,30 @@ npm pack
 
 `npm pack` will run the `prepack` script first, which builds the project so the tarball includes `dist/` and the `opc-ua-modeler` CLI.
 
+### Publish to GitHub Packages (npm)
+
+This repo is configured to publish to GitHub Packages under the scope `@sojukrishna`.
+
+After you create a GitHub Release, the workflow `.github/workflows/publish.yml` publishes the npm package.
+Once published, a **Packages** link appears on the repo home page.
+
+Install from GitHub Packages:
+
+```bash
+npm install @sojukrishna/opc-ua-modeler
+```
+
+Note: consumers need authentication for GitHub Packages. They must create an `~/.npmrc` with a GitHub token:
+
+```ini
+@sojukrishna:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+```
+
 This produces a `*.tgz` file which can be installed locally, for example:
 
 ```bash
-npm install -g ./opc-ua-modeler-0.1.0.tgz
+npm install -g ./sojukrishna-opc-ua-modeler-0.1.0.tgz
 opc-ua-modeler --port 5173
 ```
 

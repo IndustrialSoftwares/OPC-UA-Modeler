@@ -1,9 +1,16 @@
 {
-  "name": "opc-ua-modeler",
+  "name": "@sojukrishna/opc-ua-modeler",
   "version": "0.1.0",
   "description": "Web Version of the OPC UA Modeler",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sojukrishna/OPC-UA-Modeler.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=18"
   },
