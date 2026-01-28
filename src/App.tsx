@@ -4,7 +4,7 @@ import { iconCloudUploadFilled } from '@siemens/ix-icons/icons';
 import FileImport from './components/FileImport/FileImport';
 import { FileImportHandle } from './components/FileImport/FileImport';
 import NodeTree from './components/NodeTree/NodeTree';
-import NodeDetails from './components/NodeDetails/NodeDetails';
+import DetailPanel from './components/DetailPanel/DetailPanel';
 import { NodesetMetadata, OpcUaNode, OpcUaNodeset, ImportError, NamespaceConflictStrategy } from '@/types';
 import './App.css';
 
@@ -56,7 +56,11 @@ function App() {
               onNodeSelect={setSelectedNode}
               selectedNodeId={selectedNode?.nodeId}
             />
-            <NodeDetails node={selectedNode} />
+            <DetailPanel 
+              selectedNode={selectedNode} 
+              nodesetData={activeNodeset}
+              onNodeSelect={setSelectedNode}
+            />
           </div>
         ) : (
           <div className="empty-workspace">
