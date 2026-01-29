@@ -68,6 +68,32 @@ npm run dev
 
 4. Open your browser and navigate to `http://localhost:5173`
 
+## Running Tests
+
+Run the concise commands below to execute the project's Vitest tests.
+
+- Run all tests:
+
+```bash
+npm run test
+```
+
+- Run a single test file:
+
+```bash
+npx vitest run src/services/file-import.service.test.ts
+```
+
+- Run tests interactively (UI):
+
+```bash
+npm run test:ui
+```
+
+Notes:
+- Use `npx vitest run --dir src/services --reporter verbose` for verbose output while developing service tests.
+- The test environment includes `jsdom`, so browser-like APIs such as `File` and `DOMParser` are available.
+
 ## Usage
 
 1. **Import a Nodeset**: Click the upload area or drag-and-drop an OPC UA nodeset XML file
