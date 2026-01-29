@@ -51,7 +51,7 @@ function PropertyItem({ label, value, copyable = false }: PropertyItemProps) {
         {copyable && displayValue !== '-' && (
           <IxIconButton
             icon={iconCopy}
-            ghost
+            variant="subtle-primary"
             size="16"
             onClick={handleCopy}
             title="Copy to clipboard"
@@ -279,7 +279,7 @@ function DetailPanel({ selectedNode, nodesetData, onNodeSelect }: DetailPanelPro
           </span>
         </div>
         <div className="detail-actions">
-          <IxButton ghost onClick={() => {
+          <IxButton variant="subtle-primary" onClick={() => {
             navigator.clipboard.writeText(selectedNode.nodeId);
           }}>
             <IxIcon name={iconCopy} size="16" />
@@ -351,7 +351,7 @@ function DetailPanel({ selectedNode, nodesetData, onNodeSelect }: DetailPanelPro
       <PropertySection title="Extended Information" defaultExpanded={false}>
         <div className="extended-info">
           <div className="info-toggle">
-            <IxButton outline onClick={() => setShowRawData(!showRawData)}>
+            <IxButton variant="secondary" onClick={() => setShowRawData(!showRawData)}>
               {showRawData ? 'Hide' : 'Show'} Raw Data (JSON)
             </IxButton>
           </div>

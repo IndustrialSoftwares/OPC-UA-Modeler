@@ -1,6 +1,6 @@
 {
   "name": "@IndustrialSoftwares/opc-ua-modeler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Web Version of the OPC UA Modeler",
   "type": "module",
   "license": "MIT",
@@ -36,8 +36,9 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "@siemens/ix": "^2.5.0",
-    "@siemens/ix-react": "^2.5.0",
+    "@siemens/ix": "~4.2.0",
+    "@siemens/ix-icons": "^3.3.0",
+    "@siemens/ix-react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "vis-network": "^10.0.2",

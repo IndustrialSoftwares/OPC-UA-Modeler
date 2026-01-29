@@ -349,7 +349,7 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
         <div className="import-header">
           <h2>Import OPC UA Nodeset</h2>
           {typeof isDialogOpen === 'boolean' && (
-            <IxButton variant="secondary" outline onClick={onDialogClose}>
+            <IxButton variant="secondary" onClick={onDialogClose}>
               Close
             </IxButton>
           )}
@@ -365,11 +365,11 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
             <p>📥 Drag & Drop XML files here</p>
             <span className="muted">or</span>
               <div className="upload-actions">
-                <IxButton variant="primary" outline onClick={handleBrowseClick} disabled={loading}>
+                <IxButton variant="primary" onClick={handleBrowseClick} disabled={loading}>
                   Browse Files
                 </IxButton>
                 <div className="recent-files">
-                  <IxButton variant="secondary" outline onClick={() => setShowRecent((prev) => !prev)}>
+                  <IxButton variant="secondary" onClick={() => setShowRecent((prev) => !prev)}>
                     Recent Files ▾
                   </IxButton>
                   {showRecent && (
@@ -387,7 +387,7 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
                         </ul>
                       )}
                       {recentFiles.length > 0 && (
-                        <IxButton variant="secondary" outline onClick={handleClearRecent}>
+                        <IxButton variant="secondary" onClick={handleClearRecent}>
                           Clear History
                         </IxButton>
                       )}
@@ -483,7 +483,7 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
                           <span>🕒 {item.metadata.loadedAt.toLocaleString()}</span>
                         </div>
                       </div>
-                      <IxButton variant="primary" outline onClick={() => handleRemoveNodeset(item.metadata.id)}>
+                      <IxButton variant="secondary" onClick={() => handleRemoveNodeset(item.metadata.id)}>
                         Remove
                       </IxButton>
                     </div>
