@@ -30,7 +30,7 @@ interface NodeGraphProps {
 
 const NodeGraph: React.FC<NodeGraphProps> = ({ activeNodeset, selectedNodeId, onNodeSelect }) => {
   const graphRef = useRef<HTMLDivElement>(null);
-  const networkRef = useRef<any>(null);
+  const networkRef = useRef<Network | null>(null);
 
   useEffect(() => {
     if (graphRef.current && activeNodeset) {
