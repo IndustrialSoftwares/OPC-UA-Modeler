@@ -21,8 +21,16 @@ declare module 'vis-network/standalone' {
     edges: DataSet<{ id: string; from: string; to: string; label?: string; [key: string]: unknown }>;
   }
 
+  export interface NetworkEvents {
+    selectNode: { nodes: Array<string | number>; edges: Array<string | number> };
+    deselectNode: { nodes: Array<string | number>; edges: Array<string | number>; previousSelection: { nodes: Array<string | number>; edges: Array<string | number> } };
+    click: { nodes: Array<string | number>; edges: Array<string | number>; pointer: { DOM: { x: number; y: number }; canvas: { x: number; y: number } } };
+    [key: string]: unknown;
+  }
+
   export class Network {
     constructor(container: HTMLElement, data: NetworkData, options?: NetworkOptions);
+    on<K extends keyof NetworkEvents>(eventName: K, callback: (params: NetworkEvents[K]) => void): void;
     on(eventName: string, callback: (params: unknown) => void): void;
     selectNodes(nodeIds: string[]): void;
     destroy(): void;
