@@ -7,6 +7,11 @@ import App from './App';
 // Purpose: verify the header renders, the upload control is present,
 // and the import dialog opens when the upload button is clicked.
 
+// Mock @siemens/ix types and configurations
+vi.mock('@siemens/ix', () => ({
+  AppSwitchConfiguration: {},
+}));
+
 // Mock Siemens IX components used by `App` to avoid pulling in the full UI
 // library during tests. Each mock returns a simple DOM element that
 // preserves the important contract used by `App` (props and children).
@@ -14,19 +19,33 @@ vi.mock('@siemens/ix-react', () => ({
   // Application shell wrapper
   IxApplication: (props: React.PropsWithChildren<unknown>) => <div>{props.children}</div>,
   // Header component: exposes `name` prop and child header controls
-  IxApplicationHeader: (props: { name?: React.ReactNode; children?: React.ReactNode }) => (
+  IxApplicationHeader: (props: { name?: React.ReactNode; nameSuffix?: string; children?: React.ReactNode }) => (
     <header>{props.name}{props.children}</header>
   ),
   // Icon button: forward onClick and render children so tests can click it
   IxIconButton: (props: { onClick?: () => void; children?: React.ReactNode }) => (
     <button onClick={props.onClick}>{props.children}</button>
   ),
+  // Regular button: forward onClick and render children so tests can click it
+  IxButton: (props: { onClick?: () => void; children?: React.ReactNode }) => (
+    <button onClick={props.onClick}>{props.children}</button>
+  ),
+  // Menu components
+  IxMenu: (props: React.PropsWithChildren<unknown>) => <nav>{props.children}</nav>,
+  IxMenuSettings: () => <div data-testid="menu-settings" />,
+  IxMenuAbout: () => <div data-testid="menu-about" />,
+  // Content components
+  IxContent: (props: React.PropsWithChildren<unknown>) => <main>{props.children}</main>,
 }));
 
 // Mock icon module used by the header. We don't need the actual icon
 // implementation; a placeholder value is sufficient for tests.
 vi.mock('@siemens/ix-icons/icons', () => ({
-  iconCloudUploadFilled: 'iconCloudUploadFilled',
+  iconCloudUpload: 'iconCloudUpload',
+  iconClear: 'iconClear',
+  iconPrint: 'iconPrint',
+  iconMoon: 'iconMoon',
+  iconSun: 'iconSun',
 }));
 
 // Mock child components used by `App`.
@@ -67,7 +86,7 @@ describe('App component', () => {
   it('renders header and Upload button', () => {
     // Smoke test: ensure top-level header text and the Upload button are present
     render(<App />);
-    expect(screen.getByText('OPC UA Modeler')).toBeTruthy();
+    expect(screen.getByText('OPC UA Web Modeler')).toBeTruthy();
     expect(screen.getByRole('button', { name: /Upload/i })).toBeTruthy();
   });
 

@@ -1,16 +1,16 @@
 import {
   IxApplication,
   IxApplicationHeader,
-  IxIconButton,
+  IxIconButton, IxButton,
   IxContent,
   IxMenu,
   IxMenuAbout,
   IxMenuSettings
 } from '@siemens/ix-react';
 import { AppSwitchConfiguration } from '@siemens/ix';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
-  iconCloudUpload, iconClear, iconPrint
+  iconCloudUpload, iconClear, iconPrint, iconMoon, iconSun
 } from '@siemens/ix-icons/icons';
 import FileImport from './components/FileImport/FileImport';
 import { FileImportHandle } from './components/FileImport/FileImport';
@@ -25,6 +25,37 @@ function App() {
   const fileImportRef = useRef<FileImportHandle>(null);
   const [selectedNode, setSelectedNode] = useState<OpcUaNode | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    // Initialize theme from localStorage or system preference
+    const htmlElement = document.querySelector('html');
+    if (!htmlElement) return;
+    
+    // Set the theme to classic
+    htmlElement.setAttribute('data-ix-theme', 'classic');
+    
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      htmlElement.setAttribute('data-ix-color-schema', savedTheme);
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialTheme = prefersDark ? 'dark' : 'light';
+      setTheme(initialTheme);
+      htmlElement.setAttribute('data-ix-color-schema', initialTheme);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    const htmlElement = document.querySelector('html');
+    if (htmlElement) {
+      htmlElement.setAttribute('data-ix-color-schema', newTheme);
+    }
+    localStorage.setItem('theme', newTheme);
+  };
   const handleNodesetLoaded = (nodeset: OpcUaNodeset) => {
     setNodesets((prev) => {
       const updated = [...prev, nodeset];
@@ -63,6 +94,15 @@ function App() {
     <IxApplication appSwitchConfig={appSwitchConfig}>
       <IxApplicationHeader name="OPC UA Web Modeler" nameSuffix='Information Model Viewer'>
         <div className="placeholder-logo" slot="logo"></div>
+        <IxButton
+          icon={theme === 'light' ? iconMoon : iconSun}
+          onClick={toggleTheme}
+          variant="subtle-tertiary"
+          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+          aria-label="Toggle theme"
+        >
+          {theme === 'light' ? 'Dark' : 'Light'}
+        </IxButton>
 
         <div slot="secondary">
           <IxIconButton
