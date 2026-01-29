@@ -23,3 +23,15 @@
   color: var(--theme-color-soft-text);
   text-align: center;
 }
+
+.placeholder-logo {
+  float: left;
+  width: 8.625rem;
+  height: 32px;
+  background-image: url('/images/opc-ua-logo.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
