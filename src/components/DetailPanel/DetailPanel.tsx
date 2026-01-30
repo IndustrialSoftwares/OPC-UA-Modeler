@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IxButton, IxIcon, IxIconButton, IxEmptyState } from '@siemens/ix-react';
-import { iconCopy, iconChevronDown, iconChevronRight } from '@siemens/ix-icons/icons';
+import { iconCopy, iconChevronDown, iconChevronRight, iconInfo } from '@siemens/ix-icons/icons';
 import { OpcUaNode, ParsedNodeset } from '@/types';
 import './DetailPanel.css';
 
@@ -231,7 +231,7 @@ function EmptyState() {
         <IxEmptyState
           header="No node selected"
           subHeader="Select a node from the tree to view its details"
-          icon="info"
+          icon={iconInfo}
         />
       </div>
     </div>
