@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { IxButton, IxCard, IxCardContent, IxIcon, IxIconButton } from '@siemens/ix-react';
-import { iconCopy, iconChevronDown, iconChevronRight } from '@siemens/ix-icons/icons';
+import { IxButton, IxCard, IxCardContent, IxIcon, IxIconButton, IxBlind, IxTypography } from '@siemens/ix-react';
+import { iconCopy, iconChevronRight } from '@siemens/ix-icons/icons';
 import { OpcUaNode, ParsedNodeset } from '@/types';
 import './DetailPanel.css';
 
@@ -17,16 +17,17 @@ interface PropertySectionProps {
 }
 
 function PropertySection({ title, children, defaultExpanded = true }: PropertySectionProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isCollapsed, setIsCollapsed] = useState(!defaultExpanded);
 
   return (
-    <div className="property-section">
-      <div className="section-header" onClick={() => setIsExpanded(!isExpanded)}>
-        <IxIcon name={isExpanded ? iconChevronDown : iconChevronRight} size="16" />
-        <h4>{title}</h4>
-      </div>
-      {isExpanded && <div className="section-content">{children}</div>}
-    </div>
+    <IxBlind
+      label={title}
+      collapsed={isCollapsed}
+      onCollapsedChange={(e) => setIsCollapsed(e.detail)}
+      variant="outline"
+    >
+      <div className="section-content">{children}</div>
+    </IxBlind>
   );
 }
 
@@ -273,17 +274,18 @@ function DetailPanel({ selectedNode, nodesetData, onNodeSelect }: DetailPanelPro
       {/* Header Section */}
       <div className="detail-header">
         <div className="detail-title-section">
-          <h2 className="detail-title">{selectedNode.displayName}</h2>
+          <IxTypography className="detail-title">{selectedNode.displayName}</IxTypography>
           <span className={getNodeClassBadgeClass(selectedNode.nodeClass)}>
             {selectedNode.nodeClass}
           </span>
         </div>
         <div className="detail-actions">
-          <IxButton variant="subtle-primary" onClick={() => {
+          <IxButton icon={iconCopy} variant="tertiary" onClick={() => {
             navigator.clipboard.writeText(selectedNode.nodeId);
           }}>
-            <IxIcon name={iconCopy} size="16" />
+            
             Copy NodeId
+
           </IxButton>
         </div>
       </div>

@@ -9,7 +9,8 @@
 .file-import-dialog-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,7 +18,8 @@
 }
 
 .file-import-dialog {
-  width: min(720px, 92vw);
+  width: 600px;
+  max-width: 92vw;
   max-height: 90vh;
   overflow: auto;
 }
@@ -48,25 +50,15 @@
   margin: 2rem 0;
 }
 
-.drop-zone {
-  border: 2px dashed var(--theme-color-soft-bdr);
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.drop-zone.active {
-  border-color: var(--theme-color-primary);
-  background-color: var(--theme-color-soft-bdr);
-}
-
-.upload-actions {
+.upload-options {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
   align-items: center;
   margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: var(--theme-color-component-1);
+  border-radius: 8px;
 }
 
 .recent-files {

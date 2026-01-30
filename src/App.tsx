@@ -5,15 +5,15 @@ import {
   IxContent,
   IxMenu,
   IxMenuAbout,
-  IxMenuSettings
+  IxMenuSettings,
+  showModal
 } from '@siemens/ix-react';
 import { AppSwitchConfiguration } from '@siemens/ix';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   iconCloudUpload, iconClear, iconPrint, iconMoon, iconSun
 } from '@siemens/ix-icons/icons';
-import FileImport from './components/FileImport/FileImport';
-import { FileImportHandle } from './components/FileImport/FileImport';
+import FileImportModal from './components/FileImport/FileImport';
 import NodeTree from './components/NodeTree/NodeTree';
 import DetailPanel from './components/DetailPanel/DetailPanel';
 import { OpcUaNode, OpcUaNodeset, ImportError, NamespaceConflictStrategy } from '@/types';
@@ -22,9 +22,7 @@ import './App.css';
 function App() {
   const [, setNodesets] = useState<OpcUaNodeset[]>([]);
   const [activeNodeset, setActiveNodeset] = useState<OpcUaNodeset | null>(null);
-  const fileImportRef = useRef<FileImportHandle>(null);
   const [selectedNode, setSelectedNode] = useState<OpcUaNode | null>(null);
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
@@ -90,6 +88,19 @@ function App() {
     ],
   };
 
+  const openImportDialog = async () => {
+    await showModal({
+      size: '600',
+      content: (
+        <FileImportModal
+          onNodesetLoaded={handleNodesetLoaded}
+          onError={handleImportError}
+          namespaceConflictStrategy={NamespaceConflictStrategy.WARN_AND_CONTINUE}
+        />
+      ),
+    });
+  };
+
   return (
     <IxApplication appSwitchConfig={appSwitchConfig}>
       <IxApplicationHeader name="OPC UA Web Modeler" nameSuffix='Information Model Viewer'>
@@ -107,7 +118,7 @@ function App() {
         <div slot="secondary">
           <IxIconButton
             icon={iconCloudUpload}
-            onClick={() => setIsImportDialogOpen(true)}
+            onClick={openImportDialog}
             oval
             variant="subtle-tertiary"
             title="Upload Nodeset File(s)"
@@ -128,7 +139,10 @@ function App() {
           </IxIconButton>
           <IxIconButton
             icon={iconClear}
-            onClick={() => setIsImportDialogOpen(true)}
+            onClick={() => {
+              setActiveNodeset(null);
+              setSelectedNode(null);
+            }}
             oval
             variant="subtle-tertiary"
             title="Clear Viewer"
@@ -143,16 +157,7 @@ function App() {
         <IxMenuAbout></IxMenuAbout>
       </IxMenu>
       <IxContent>
-
         <div className="app-content">
-          <FileImport
-            ref={fileImportRef}
-            onNodesetLoaded={handleNodesetLoaded}
-            onError={handleImportError}
-            namespaceConflictStrategy={NamespaceConflictStrategy.WARN_AND_CONTINUE}
-            isDialogOpen={isImportDialogOpen}
-            onDialogClose={() => setIsImportDialogOpen(false)}
-          />
           {activeNodeset ? (
             <div className="workspace">
               <NodeTree

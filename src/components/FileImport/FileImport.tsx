@@ -1,17 +1,10 @@
-import { IxButton, IxCard, IxCardContent } from '@siemens/ix-react';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { IxButton, IxModalContent, IxModalHeader, IxUpload, Modal, ModalRef } from '@siemens/ix-react';
+import { UploadFileState } from '@siemens/ix';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fileImportService } from '@/services/file-import.service';
 import { Namespace, NodesetMetadata, OpcUaNodeset } from '@/types/opcua.types';
 import { ImportError, NamespaceConflictStrategy, ValidationResult,ErrorMessages } from '@/types/import.types';
 import './FileImport.css';
-
-type WebkitFileSystemEntry = {
-  isDirectory: boolean;
-};
-
-type WebkitDataTransferItem = DataTransferItem & {
-  webkitGetAsEntry?: () => WebkitFileSystemEntry | null;
-};
 
 interface FileImportProps {
   onNodesetLoaded: (nodeset: OpcUaNodeset, metadata: NodesetMetadata) => void;
@@ -19,13 +12,6 @@ interface FileImportProps {
   maxFileSize?: number; // in bytes, default 10MB
   acceptedFormats?: string[]; // default ['.xml']
   namespaceConflictStrategy?: NamespaceConflictStrategy;
-  isDialogOpen?: boolean;
-  onDialogClose?: () => void;
-}
-
-export interface FileImportHandle {
-  openFileDialog: () => void;
-  handleExternalFiles: (files: FileList | File[]) => void;
 }
 
 type LoadedNodesetItem = {
@@ -108,9 +94,10 @@ const resolveNamespaceConflict = (
 
 const RECENT_FILES_KEY = 'opcua_recent_nodesets';
 
-const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoaded, onError, maxFileSize = 10 * 1024 * 1024, acceptedFormats = ['.xml'], namespaceConflictStrategy = NamespaceConflictStrategy.WARN_AND_CONTINUE, isDialogOpen, onDialogClose }, ref) => {
+const FileImportModal = ({ onNodesetLoaded, onError, maxFileSize = 10 * 1024 * 1024, acceptedFormats = ['.xml'], namespaceConflictStrategy = NamespaceConflictStrategy.WARN_AND_CONTINUE }: FileImportProps) => {
+  const modalRef = useRef<ModalRef>(null);
   const [loading, setLoading] = useState(false);
-  const [isDragActive, setIsDragActive] = useState(false);
+  const [uploadState, setUploadState] = useState<UploadFileState>(UploadFileState.SELECT_FILE);
   const [requiredModels, setRequiredModels] = useState<string[]>([]);
   const [loadedNodesets, setLoadedNodesets] = useState<LoadedNodesetItem[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -149,10 +136,6 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
 
   const removeNotification = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-  }, []);
-
-  const handleBrowseClick = useCallback(() => {
-    fileInputRef.current?.click();
   }, []);
 
   const handleFiles = useCallback(async (files: FileList | File[]) => {
@@ -257,6 +240,10 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
         setLoadedNodesets((prev) => [item, ...prev]);
         onNodesetLoaded(parsed, metadata);
         addNotification({ id: `${file.name}-success`, type: 'success', message: `Loaded '${file.name}' with ${metadata.nodeCount} nodes` });
+        setUploadState(UploadFileState.UPLOAD_SUCCESSED);
+        
+        // Close modal after successful upload
+        setTimeout(() => modalRef.current?.close(), 1500);
 
         const recentEntry: RecentFileEntry = {
           id: metadata.id,
@@ -271,11 +258,14 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
       const message = err instanceof Error ? err.message : 'Failed to parse nodeset file';
       onError({ code: 'PARSE_ERROR', message });
       addNotification({ id: 'parse-error', type: 'error', message });
+      setUploadState(UploadFileState.UPLOAD_FAILED);
       console.error('Parse error:', err);
     } finally {
       setLoading(false);
       setProgress(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
+      // Reset upload state after a delay
+      setTimeout(() => setUploadState(UploadFileState.SELECT_FILE), 3000);
     }
   }, [
     acceptedFormats,
@@ -291,45 +281,18 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
     userMaxFileSizeMB,
   ]);
 
-  useImperativeHandle(ref, () => ({
-    openFileDialog: () => fileInputRef.current?.click(),
-    handleExternalFiles: handleFiles,
-  }), [handleFiles]);
+  const handleFilesChanged = useCallback((event: CustomEvent<File[]>) => {
+    const files = event.detail;
+    if (files && files.length > 0) {
+      setUploadState(UploadFileState.LOADING);
+      handleFiles(files);
+    }
+  }, [handleFiles]);
 
   const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
     handleFiles(files);
-  };
-
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    setIsDragActive(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragActive(false);
-  };
-
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    setIsDragActive(false);
-
-    const items = event.dataTransfer.items;
-    if (items) {
-      for (const item of Array.from(items)) {
-        const entry = (item as WebkitDataTransferItem).webkitGetAsEntry?.();
-        if (entry && entry.isDirectory) {
-          addNotification({ id: `folder-drop-${Date.now()}`, type: 'warning', message: 'Folder drop is not supported. Please drop XML files only.' });
-          return;
-        }
-      }
-    }
-
-    const files = event.dataTransfer.files;
-    if (files && files.length > 0) {
-      handleFiles(files);
-    }
   };
 
   const handleRemoveNodeset = (id: string) => {
@@ -343,85 +306,80 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
 
   const acceptedText = acceptedFormats.join(', ');
 
-  const renderContent = () => (
-    <IxCard className="import-card">
-      <IxCardContent>
-        <div className="import-header">
-          <h2>Import OPC UA Nodeset</h2>
-          {typeof isDialogOpen === 'boolean' && (
-            <IxButton variant="secondary" onClick={onDialogClose}>
-              Close
-            </IxButton>
-          )}
-        </div>
-          <p>Upload an OPC UA nodeset XML file to begin viewing</p>
+  return (
+    <Modal ref={modalRef}>
+      <IxModalHeader onCloseClick={() => modalRef.current?.dismiss()}>
+        Import OPC UA Nodeset
+      </IxModalHeader>
+      <IxModalContent>
+        <p>Upload an OPC UA nodeset XML file to begin viewing</p>
 
-          <div
-            className={`drop-zone ${isDragActive ? 'active' : ''}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <p>📥 Drag & Drop XML files here</p>
-            <span className="muted">or</span>
-              <div className="upload-actions">
-                <IxButton variant="primary" onClick={handleBrowseClick} disabled={loading}>
-                  Browse Files
-                </IxButton>
-                <div className="recent-files">
-                  <IxButton variant="secondary" onClick={() => setShowRecent((prev) => !prev)}>
-                    Recent Files ▾
-                  </IxButton>
-                  {showRecent && (
-                    <div className="recent-dropdown">
-                      {recentFiles.length === 0 ? (
-                        <p className="muted">No recent files</p>
-                      ) : (
-                        <ul>
-                          {recentFiles.map((entry) => (
-                            <li key={entry.id}>
-                              <span>{entry.name}</span>
-                              <span className="muted">{(entry.size / 1024).toFixed(1)} KB</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {recentFiles.length > 0 && (
-                        <IxButton variant="secondary" onClick={handleClearRecent}>
-                          Clear History
-                        </IxButton>
-                      )}
-                    </div>
+        <IxUpload
+            accept={acceptedText}
+            multiple
+            state={uploadState}
+            disabled={loading}
+            selectFileText="+ Drag OPC UA nodeset XML files here or..."
+            i18nUploadFile="Browse Files"
+            loadingText="Processing files..."
+            uploadSuccessText="Nodeset loaded successfully"
+            uploadFailedText="Upload failed. Please try again."
+            onFilesChanged={handleFilesChanged}
+          />
+
+          <div className="upload-options">
+            <div className="recent-files">
+              <IxButton variant="secondary" onClick={() => setShowRecent((prev) => !prev)}>
+                Recent Files ▾
+              </IxButton>
+              {showRecent && (
+                <div className="recent-dropdown">
+                  {recentFiles.length === 0 ? (
+                    <p className="muted">No recent files</p>
+                  ) : (
+                    <ul>
+                      {recentFiles.map((entry) => (
+                        <li key={entry.id}>
+                          <span>{entry.name}</span>
+                          <span className="muted">{(entry.size / 1024).toFixed(1)} KB</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {recentFiles.length > 0 && (
+                    <IxButton variant="secondary" onClick={handleClearRecent}>
+                      Clear History
+                    </IxButton>
                   )}
                 </div>
-                <div className="max-size-input">
-                  <label className="muted" style={{ marginRight: 8 }}>Preferred max size (MB):</label>
-                  <input
-                    type="number"
-                    min="0.1"
-                    step="0.1"
-                    value={userMaxFileSizeMB}
-                    onChange={(e) => {
-                      let v = parseFloat(e.target.value);
-                      if (Number.isNaN(v)) v = 0.2;
-                      if (v <= 0.1) v = 0.2; // enforce > 0.1 MB
-                      setUserMaxFileSizeMB(v);
-                    }}
-                    aria-label="Preferred max file size in MB"
-                    style={{ width: 80 }}
-                  />
-                  <span className="muted" style={{ marginLeft: 12 }}>Current limit: {(maxFileSize / (1024 * 1024)).toFixed(1)} MB</span>
-                </div>
-              </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={acceptedText}
-              multiple
-              onChange={handleFileInputChange}
-              style={{ display: 'none' }}
-            />
+              )}
+            </div>
+            <div className="max-size-input">
+              <label className="muted" style={{ marginRight: 8 }}>Max size (MB):</label>
+              <input
+                type="number"
+                min="0.1"
+                step="0.1"
+                value={userMaxFileSizeMB}
+                onChange={(e) => {
+                  let v = parseFloat(e.target.value);
+                  if (Number.isNaN(v)) v = 0.2;
+                  if (v <= 0.1) v = 0.2;
+                  setUserMaxFileSizeMB(v);
+                }}
+                aria-label="Preferred max file size in MB"
+                style={{ width: 80 }}
+              />
+            </div>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={acceptedText}
+            multiple
+            onChange={handleFileInputChange}
+            style={{ display: 'none' }}
+          />
 
           {loading && (
             <div className="loading-indicator">
@@ -502,28 +460,9 @@ const FileImport = forwardRef<FileImportHandle, FileImportProps>(({ onNodesetLoa
               <li>Node types: Object, Variable, Method, DataType, etc.</li>
             </ul>
           </div>
-      </IxCardContent>
-    </IxCard>
+      </IxModalContent>
+    </Modal>
   );
+};
 
-  if (typeof isDialogOpen === 'boolean') {
-    if (!isDialogOpen) return null;
-    return (
-      <div className="file-import-dialog-backdrop" role="dialog" aria-modal="true">
-        <div className="file-import-dialog">
-          {renderContent()}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="file-import-container">
-      {renderContent()}
-    </div>
-  );
-});
-
-FileImport.displayName = 'FileImport';
-
-export default FileImport;
+export default FileImportModal;
