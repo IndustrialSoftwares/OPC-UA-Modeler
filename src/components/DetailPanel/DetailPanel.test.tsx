@@ -39,6 +39,7 @@ vi.mock('@siemens/ix-icons/icons', () => ({
   iconCopy: 'iconCopy',
   iconChevronDown: 'iconChevronDown',
   iconChevronRight: 'iconChevronRight',
+  iconInfo: 'iconInfo',
 }));
 
 import DetailPanel from './DetailPanel';

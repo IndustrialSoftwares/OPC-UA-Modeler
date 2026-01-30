@@ -67,16 +67,20 @@
 
 .recent-dropdown {
   position: absolute;
-  top: 2.5rem;
-  right: 0;
-  background: var(--theme-color-std-bkg);
+  top: 100%;
+  left: 0;
+  margin-top: 0.25rem;
+  background: var(--theme-color-2);
   border: 1px solid var(--theme-color-soft-bdr);
   border-radius: 6px;
   padding: 0.75rem;
   min-width: 220px;
-  z-index: 10;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
   display: grid;
   gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .recent-dropdown ul {
@@ -90,7 +94,21 @@
 .recent-dropdown li {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.85rem;
+}
+
+.recent-dropdown li span:first-child {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.recent-dropdown li span.muted {
+  flex-shrink: 0;
 }
 
 .muted {

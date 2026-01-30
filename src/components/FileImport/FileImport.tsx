@@ -121,6 +121,23 @@ const FileImportModal = ({ onNodesetLoaded, onError, maxFileSize = 10 * 1024 * 1
     }
   }, []);
 
+  // Close recent dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.recent-files')) {
+        setShowRecent(false);
+      }
+    };
+    
+    if (showRecent) {
+      document.addEventListener('click', handleClickOutside);
+      return () => {
+        document.removeEventListener('click', handleClickOutside);
+      };
+    }
+  }, [showRecent]);
+
   const persistRecentFiles = useCallback((entries: RecentFileEntry[]) => {
     setRecentFiles(entries);
     try {
@@ -340,7 +357,7 @@ const FileImportModal = ({ onNodesetLoaded, onError, maxFileSize = 10 * 1024 * 1
                     <ul>
                       {recentFiles.map((entry) => (
                         <li key={entry.id}>
-                          <span>{entry.name}</span>
+                          <span title={entry.name}>{entry.name}</span>
                           <span className="muted">{(entry.size / 1024).toFixed(1)} KB</span>
                         </li>
                       ))}
