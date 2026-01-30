@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { IxButton } from '@siemens/ix-react';
 import { OpcUaNode, ParsedNodeset, NodeClass } from '@/types';
 import './NodeGrid.css';
@@ -224,7 +224,7 @@ function NodeGrid({ nodesetData, onNodeSelect, selectedNodeId }: NodeGridProps) 
     resizeStartWidth.current = columnWidths[column];
   };
 
-  const handleResizeMove = (e: MouseEvent) => {
+  const handleResizeMove = useCallback((e: MouseEvent) => {
     if (!resizingColumn) return;
     const delta = e.clientX - resizeStartX.current;
     const newWidth = Math.max(50, resizeStartWidth.current + delta);
@@ -232,11 +232,11 @@ function NodeGrid({ nodesetData, onNodeSelect, selectedNodeId }: NodeGridProps) 
       ...prev,
       [resizingColumn]: newWidth,
     }));
-  };
+  }, [resizingColumn]);
 
-  const handleResizeEnd = () => {
+  const handleResizeEnd = useCallback(() => {
     setResizingColumn(null);
-  };
+  }, []);
 
   const handleDoubleClickResize = (column: ColumnKey) => {
     // Auto-fit: reset to default width
@@ -353,7 +353,7 @@ function NodeGrid({ nodesetData, onNodeSelect, selectedNodeId }: NodeGridProps) 
         document.removeEventListener('mouseup', handleResizeEnd);
       };
     }
-  }, [resizingColumn]);
+  }, [resizingColumn, handleResizeMove, handleResizeEnd]);
 
   // Persist column widths to localStorage
   useEffect(() => {
