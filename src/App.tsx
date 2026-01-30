@@ -1,8 +1,8 @@
 import { IxApplication, IxApplicationHeader, IxIconButton } from '@siemens/ix-react';
-import { useRef, useState } from 'react';
+import { showModal } from '@siemens/ix';
+import { useState } from 'react';
 import { iconCloudUploadFilled } from '@siemens/ix-icons/icons';
-import FileImport from './components/FileImport/FileImport';
-import { FileImportHandle } from './components/FileImport/FileImport';
+import FileImportModal from './components/FileImport/FileImport';
 import NodeTree from './components/NodeTree/NodeTree';
 import DetailPanel from './components/DetailPanel/DetailPanel';
 import { OpcUaNode, OpcUaNodeset, ImportError, NamespaceConflictStrategy } from '@/types';
@@ -11,9 +11,8 @@ import './App.css';
 function App() {
   const [, setNodesets] = useState<OpcUaNodeset[]>([]);
   const [activeNodeset, setActiveNodeset] = useState<OpcUaNodeset | null>(null);
-  const fileImportRef = useRef<FileImportHandle>(null);
   const [selectedNode, setSelectedNode] = useState<OpcUaNode | null>(null);
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  
   const handleNodesetLoaded = (nodeset: OpcUaNodeset) => {
     setNodesets((prev) => {
       const updated = [...prev, nodeset];
@@ -26,12 +25,25 @@ function App() {
     console.error('Import error:', error);
   };
 
+  const openImportDialog = async () => {
+    await showModal({
+      size: '600',
+      content: (
+        <FileImportModal
+          onNodesetLoaded={handleNodesetLoaded}
+          onError={handleImportError}
+          namespaceConflictStrategy={NamespaceConflictStrategy.WARN_AND_CONTINUE}
+        />
+      ),
+    });
+  };
+
   return (
     <IxApplication>
       <IxApplicationHeader name="OPC UA Modeler">
         <IxIconButton
           icon={iconCloudUploadFilled}
-          onClick={() => setIsImportDialogOpen(true)}
+          onClick={openImportDialog}
           oval
           variant="primary"
           title="Upload Nodeset File(s)"
@@ -41,14 +53,6 @@ function App() {
         </IxIconButton>
       </IxApplicationHeader>
       <div className="app-content">
-        <FileImport
-          ref={fileImportRef}
-          onNodesetLoaded={handleNodesetLoaded}
-          onError={handleImportError}
-          namespaceConflictStrategy={NamespaceConflictStrategy.WARN_AND_CONTINUE}
-          isDialogOpen={isImportDialogOpen}
-          onDialogClose={() => setIsImportDialogOpen(false)}
-        />
         {activeNodeset ? (
           <div className="workspace">
             <NodeTree

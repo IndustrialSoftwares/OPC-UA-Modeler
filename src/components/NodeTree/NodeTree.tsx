@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { OpcUaNode, NodeClass, ParsedNodeset } from '../../types/opcua.types';
 import './NodeTree.css';
+import { IxButton } from '@siemens/ix-react';
 
 interface NodeTreeProps {
   nodesetData: ParsedNodeset;
@@ -301,14 +302,14 @@ function NodeTree({
         aria-label="Search nodes"
       />
       {searchText && (
-        <button
+        <IxButton
           className="tree-search-clear"
           onClick={() => setSearchText('')}
           title="Clear search"
           aria-label="Clear search"
         >
           ✕
-        </button>
+        </IxButton>
       )}
     </div>
   );
@@ -319,7 +320,7 @@ function NodeTree({
       <div className="tree-filter-label">Filter by type:</div>
       <div className="tree-filter-buttons">
         {Object.values(NodeClass).map((nodeClass) => (
-          <button
+          <IxButton
             key={nodeClass}
             className={`tree-filter-button ${selectedNodeTypes.has(nodeClass) ? 'active' : ''}`}
             onClick={() => toggleNodeType(nodeClass)}
@@ -327,7 +328,7 @@ function NodeTree({
             aria-pressed={selectedNodeTypes.has(nodeClass)}
           >
             {getNodeIcon(nodeClass)} {nodeClass}
-          </button>
+          </IxButton>
         ))}
       </div>
     </div>

@@ -92,35 +92,9 @@
   border: 1px solid rgba(253, 126, 20, 0.3);
 }
 
-/* Property Sections */
-.property-section {
-  margin-bottom: 1.5rem;
-  background-color: var(--theme-color-component-2);
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid var(--theme-color-component-5);
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background-color: var(--theme-color-component-3);
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.2s;
-}
-
-.section-header:hover {
-  background-color: var(--theme-color-component-4);
-}
-
-.section-header h4 {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--theme-color-std-text);
+/* Property Sections with IxBlind */
+ix-blind {
+  margin-bottom: 1rem;
 }
 
 .section-content {
