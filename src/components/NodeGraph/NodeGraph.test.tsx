@@ -147,7 +147,8 @@ describe('NodeGraph', () => {
     expect(instance).toBeTruthy();
 
     act(() => {
-      (instance as any).triggerSelectNode('n1');
+      const instWithTrigger = instance as { triggerSelectNode?: (id: string | number) => void } | undefined;
+      instWithTrigger?.triggerSelectNode?.('n1');
     });
 
     expect(onNodeSelect).toHaveBeenCalledWith('n1');
