@@ -259,7 +259,7 @@ function App() {
         ) : (
           <IxEmptyState
             header="No nodeset loaded"
-            subHeader="Upload a nodeset file to start viewing and analyzing OPC UA information models"
+            subHeader="Welcome-Upload a nodeset file to start viewing and analyzing OPC UA information models!"
             icon={iconCloudUpload}
             action="Upload nodeset"
             onActionClick={openImportDialog}
