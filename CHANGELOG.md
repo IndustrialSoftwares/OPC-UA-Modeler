@@ -5,21 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-01-31
+
+First major release of OPC UA Modeler - a production-ready web-based tool for viewing and analyzing OPC UA nodeset XML files (viewer only option).
 
 ### Added
 - Theme toggle functionality with light/dark mode support
-- Enhanced NodeGrid component with hierarchical display
-- Advanced column features for grid view (sorting, filtering)
-- Application header with logo and additional control buttons
+- Enhanced NodeGrid component with hierarchical display capabilities
+- Advanced column features for grid view including sorting and filtering
+- Professional application header with logo and control buttons
+- Comprehensive documentation for open-source release
+- Production-ready packaging and distribution via npm
+- CLI tool (`opc-ua-modeler`) for serving the built application
+- GitHub Actions workflow for automated publishing to GitHub Packages
+- Enhanced test coverage across components
+- Project logo and branding assets
 
 ### Fixed
 - Recent Files dropdown visibility and UX improvements in FileImport component
-- IxEmptyState icon import in DetailPanel component
-- ESLint exhaustive-deps warning for resize handlers in NodeGrid
+- IxEmptyState icon import path in DetailPanel component
+- ESLint exhaustive-deps warnings for resize handlers in NodeGrid
+- Production build optimization and asset handling
 
 ### Changed
 - Enhanced localStorage mock implementation for better test coverage
+- Updated project description for clarity and SEO
+- Improved README with detailed installation and usage instructions
+- Refined CONTRIBUTING guidelines for external contributors
+
+### Contributors
+- [@varun9619](https://github.com/varun9619)
+- [@reddyshekharc55](https://github.com/reddyshekharc55)
+- [@sojukrishna](https://github.com/sojukrishna)
+- [@vineethwilson15](https://github.com/vineethwilson15)
+- [@AmoghDeshmukh](https://github.com/AmoghDeshmukh)
+
 
 ## [0.2.1] - 2026-01-30
 
