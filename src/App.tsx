@@ -60,7 +60,8 @@ function App() {
           </div>
         ) : (
           <div className="empty-workspace">
-            <p>No nodeset loaded yet.</p>
+            <p>Welcome! Please select or drag and drop a nodeset XML file to begin exploring your OPC UA model
+</p>
           </div>
         )}
       </div>
