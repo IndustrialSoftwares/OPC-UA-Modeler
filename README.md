@@ -292,11 +292,49 @@ npm pack
 
 `npm pack` will run the `prepack` script first, which builds the project so the tarball includes `dist/` and the `opc-ua-modeler` CLI.
 
+### Publish to npmjs.com (Public npm Registry)
+
+This package is published to the public npm registry at [npmjs.com](https://www.npmjs.com/package/@industrialsoftwares/opc-ua-modeler).
+
+**Install from npm (Recommended):**
+
+```bash
+npm install -g @industrialsoftwares/opc-ua-modeler
+opc-ua-modeler --port 5173
+```
+
+**Publishing to npm:**
+
+To publish to npm, you need to use the npm-specific configuration files:
+
+1. **Replace configuration files:**
+   ```bash
+   cp package_npm.json package.json
+   cp .npmrc_npm .npmrc
+   ```
+
+2. **Login to npm:**
+   ```bash
+   npm login
+   # Use your npm username and a granular access token with 2FA bypass enabled
+   ```
+
+3. **Publish:**
+   ```bash
+   npm publish --access public
+   ```
+
+**Note:** The package name must be lowercase (`@industrialsoftwares/opc-ua-modeler`) as npm doesn't allow capital letters in scoped package names.
+
+**Configuration Files:**
+- `package_npm.json` - Package configuration for npmjs.com with lowercase scope
+- `.npmrc_npm` - npm registry configuration pointing to `https://registry.npmjs.org`
+
 ### Publish to GitHub Packages (npm)
 
-This repo is configured to publish to GitHub Packages under the scope `@IndustrialSoftwares`.
+This repo can also be configured to publish to GitHub Packages under the scope `@IndustrialSoftwares`.
 
-After you create a GitHub Release, the workflow `.github/workflows/publish.yml` publishes the npm package.
+After you create a GitHub Release, the workflow `.github/workflows/publish.yml` can publish the npm package to GitHub Packages.
 Once published, a **Packages** link appears on the repo home page.
 
 Install from GitHub Packages:
@@ -312,10 +350,13 @@ Note: consumers need authentication for GitHub Packages. They must create an `~/
 //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
 ```
 
+### Install from Local Tarball
+
 This produces a `*.tgz` file which can be installed locally, for example:
 
 ```bash
-npm install -g ./IndustrialSoftwares-opc-ua-modeler-0.2.1.tgz
+npm pack
+npm install -g ./industrialsoftwares-opc-ua-modeler-1.0.0.tgz
 opc-ua-modeler --port 5173
 ```
 
